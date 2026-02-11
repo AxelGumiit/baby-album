@@ -1,20 +1,14 @@
-"""
-Django settings for backend project.
-"""
-
+import os
 from pathlib import Path
 
-# ----------------------
-# Paths
-# ----------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ----------------------
 # Security
 # ----------------------
-SECRET_KEY = 'django-insecure-5_akj1+rhcpn=40u*5jjk3=^05%$ovn7q)kgoyie72s2to9ha5'
-DEBUG = False  # Set False in production
-ALLOWED_HOSTS = ['*']  
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "fallback-secret-key-for-dev")
+DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 # ----------------------
 # Installed Apps
@@ -29,14 +23,14 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'corsheaders',   # ✅ Required for frontend API requests
-    'album',         # Your app
+    'album',
 ]
 
 # ----------------------
 # Middleware
 # ----------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',          # ✅ Must be first
+    'corsheaders.middleware.CorsMiddleware',          # must be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -44,7 +38,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',    # ✅ For static files
+    'whitenoise.middleware.WhiteNoiseMiddleware',    # for static files
 ]
 
 # ----------------------
@@ -70,7 +64,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 # ----------------------
-# Database
+# Database (SQLite)
 # ----------------------
 DATABASES = {
     'default': {
@@ -83,18 +77,10 @@ DATABASES = {
 # Password Validators
 # ----------------------
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',},
 ]
 
 # ----------------------
@@ -110,21 +96,18 @@ USE_TZ = True
 # ----------------------
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # ----------------------
-# CORS (Allow React Frontend)
+# CORS
 # ----------------------
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",                 # React dev server
+    "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "https://your-frontend.netlify.app",     # Netlify frontend
+    "https://shantelle1st.netlify.app",
 ]
 
-# ----------------------
-# Optional: Whitenoise Settings (if serving static files)
-# ----------------------
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
