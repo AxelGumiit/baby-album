@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
+body {
+  margin: 0;
+}
+
+/* ✨ Sparkle Layers */
+.sparkle-layer-1 {
+  background-image: radial-gradient(white 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: sparkleMove 60s linear infinite;
+  opacity: 0.3;
+}
+
+.sparkle-layer-2 {
+  background-image: radial-gradient(#f9a8d4 1px, transparent 1px);
+  background-size: 80px 80px;
+  animation: sparkleMoveReverse 90s linear infinite;
+  opacity: 0.2;
+}
+
+@keyframes sparkleMove {
+  from { background-position: 0 0; }
+  to { background-position: 1000px 1000px; }
+}
+
+@keyframes sparkleMoveReverse {
+  from { background-position: 1000px 0; }
+  to { background-position: 0 1000px; }
+}
+
+/* 🎈 Balloons */
+.balloon {
+  position: absolute;
+  top: 20%;
+  width: 70px;
+  height: 90px;
+  background: radial-gradient(circle at 30% 30%, #f472b6, #ec4899);
+  border-radius: 50% 50% 45% 45%;
+  animation: float 7s ease-in-out infinite;
+  opacity: 0.5;
+  filter: blur(0.5px);
+}
+
+.balloon::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 40px;
+  background: #d946ef;
+  top: 90px;
+  left: 50%;
+}
+
+.delay-2000 {
+  animation-delay: 2s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-30px); }
+}
+
+/* 💕 Floating Hearts */
+.heart {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #f472b6;
+  transform: rotate(45deg);
+  animation: floatHeart 10s linear infinite;
+  opacity: 0.4;
+}
+
+.heart::before,
+.heart::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #f472b6;
+  border-radius: 50%;
+}
+
+.heart::before { top: -10px; left: 0; }
+.heart::after { left: -10px; top: 0; }
+
+.heart-1 { left: 20%; animation-delay: 0s; }
+.heart-2 { right: 25%; animation-delay: 5s; }
+
+@keyframes floatHeart {
+  0% { transform: translateY(100vh) rotate(45deg); }
+  100% { transform: translateY(-10vh) rotate(45deg); }
+}
+
+/* 💫 Halo */
+.halo {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(244,114,182,0.4), transparent 70%);
+  border-radius: 50%;
+  filter: blur(40px);
+  z-index: 0;
+}
