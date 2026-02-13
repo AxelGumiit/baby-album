@@ -37,6 +37,7 @@ function Album() {
         {media.map((item) => {
           const fileUrl = item.image || item.video;
           const fileType = item.image ? "image" : "video";
+          const displayName = item.name || (fileType === "image" ? "Photo" : "Video");
 
           return (
             <motion.div
@@ -62,6 +63,9 @@ function Album() {
                   />
                 )}
               </div>
+
+              {/* Display Name */}
+              <p className="text-gray-700 font-medium mb-2 text-center">{displayName}</p>
 
               <button
                 onClick={() => downloadFile(fileUrl, item.id, fileType)}
