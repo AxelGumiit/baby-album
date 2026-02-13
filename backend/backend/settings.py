@@ -1,13 +1,13 @@
 import os
 from pathlib import Path
-import dj_database_url  # Make sure it's installed: pip install dj-database-url
-from dotenv import load_dotenv  # ← to read .env
+import dj_database_url
+from dotenv import load_dotenv
 import cloudinary
 
 # ----------------------
-# Load .env
+# Load environment variables
 # ----------------------
-load_dotenv()  # Must be at the very top, before using os.environ
+load_dotenv()  # must be at the very top
 
 # ----------------------
 # Cloudinary configuration
@@ -31,7 +31,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "*").split(",")
 
 # ----------------------
-# Installed Apps
+# Installed apps
 # ----------------------
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -66,7 +66,7 @@ MIDDLEWARE = [
 ]
 
 # ----------------------
-# URLs and Templates
+# URLs and templates
 # ----------------------
 ROOT_URLCONF = 'backend.urls'
 
@@ -97,17 +97,15 @@ DATABASES = {
 }
 
 # ----------------------
-# CORS (Frontend URL)
+# CORS (frontend URL)
 # ----------------------
-FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://shantelle1st.netlify.app",
+    "http://localhost:5173",  # local dev
+    "https://shantelle1st.netlify.app",  # deployed frontend
 ]
 
-
 # ----------------------
-# Password Validators
+# Password validators
 # ----------------------
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -126,7 +124,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
-
 # ----------------------
 # Internationalization
 # ----------------------
@@ -136,6 +133,6 @@ USE_I18N = True
 USE_TZ = True
 
 # ----------------------
-# Default primary key
+# Default primary key field type
 # ----------------------
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
