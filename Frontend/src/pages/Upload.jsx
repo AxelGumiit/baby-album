@@ -59,22 +59,6 @@ function Upload() {
         </h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
-            required
-          />
-
-          <textarea
-            placeholder="Message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-pink-300"
-            required
-          />
 
           <input
             type="file"
