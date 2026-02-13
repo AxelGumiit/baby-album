@@ -3,6 +3,9 @@ from pathlib import Path
 import dj_database_url  # Make sure it's installed: pip install dj-database-url
 from dotenv import load_dotenv  # ← to read .env
 
+
+CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "")
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS.split(",") if origin.strip()]
 import cloudinary
 
 # ----------------------
