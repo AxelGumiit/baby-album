@@ -3,7 +3,7 @@ from django.db import models
 class Photo(models.Model):
     name = models.CharField(max_length=100, blank=True)
     message = models.TextField(blank=True)
-    image = models.ImageField(upload_to='photos/')  # Cloudinary handles storage
+    image = models.ImageField(upload_to='photos/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
