@@ -9,7 +9,7 @@ function Navbar() {
       <div className="flex justify-between items-center">
         {/* Logo / Title */}
         <strong className="text-2xl md:text-3xl font-extrabold text-pink-600 drop-shadow-sm">
-          🎀 Shantelle turns ONE
+          🎀 Shantelle turn ONE
         </strong>
 
         {/* Desktop Links */}

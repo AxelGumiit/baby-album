@@ -9,6 +9,16 @@ function Album() {
       .then((data) => setPhotos(data));
   }, []);
 
+  // Function to trigger download
+  const downloadImage = (url, id) => {
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `photo-${id}.jpg`; // filename for download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
       <h2 className="text-pink-600 text-3xl font-bold mb-8">📸 Birthday Album</h2>
@@ -22,7 +32,9 @@ function Album() {
             <img
               src={photo.image}
               alt=""
-              className="w-full rounded-xl mb-4 object-cover"
+              className="w-full rounded-xl mb-4 object-cover cursor-pointer hover:opacity-90 transition"
+              onClick={() => downloadImage(photo.image, photo.id)}
+              title="Click to download"
             />
             <p className="text-gray-700 mb-2 text-center">{photo.message}</p>
             <small className="text-pink-600">— {photo.name || "With love"}</small>
