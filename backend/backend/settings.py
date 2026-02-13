@@ -2,10 +2,6 @@ import os
 from pathlib import Path
 import dj_database_url  # Make sure it's installed: pip install dj-database-url
 from dotenv import load_dotenv  # ← to read .env
-
-
-CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "")
-CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ALLOWED_ORIGINS.split(",") if origin.strip()]
 import cloudinary
 
 # ----------------------
@@ -104,7 +100,11 @@ DATABASES = {
 # CORS (Frontend URL)
 # ----------------------
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://shantelle1st.netlify.app",
+]
+
 
 # ----------------------
 # Password Validators
