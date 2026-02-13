@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
 
 function Upload() {
   const [name, setName] = useState("");
@@ -15,15 +16,37 @@ function Upload() {
     formData.append("message", message);
     formData.append("image", image);
 
-    await fetch("https://baby-album.onrender.com/api/photos/", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const res = await fetch("https://baby-album.onrender.com/api/photos/", {
+        method: "POST",
+        body: formData,
+      });
 
-    alert("Memory added 💕");
-    setName("");
-    setMessage("");
-    setImage(null);
+      if (!res.ok) throw new Error("Upload failed");
+
+      toast.success("Memory added 💕", {
+        position: "top-center",
+        duration: 4000,
+        style: {
+          background: "#F9E0E8",
+          color: "#D6336C",
+          fontWeight: "bold",
+          borderRadius: "12px",
+          padding: "16px",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
+        },
+      });
+
+      setName("");
+      setMessage("");
+      setImage(null);
+    } catch (err) {
+      toast.error("Oops! Something went wrong 😢", {
+        position: "top-center",
+        duration: 4000,
+      });
+      console.error(err);
+    }
   };
 
   return (
@@ -34,6 +57,9 @@ function Upload() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
     >
+      {/* Toast container */}
+      <Toaster />
+
       {/* Sparkles & Hearts */}
       <div className="absolute inset-0 -z-10 sparkle-layer-1"></div>
       <div className="absolute inset-0 -z-10 sparkle-layer-2"></div>
@@ -49,7 +75,7 @@ function Upload() {
 
       {/* Form Card */}
       <motion.div
-        className="max-w-md w-full bg-white p-8 rounded-2xl shadow-lg relative z-10"
+        className="max-w-md w-full bg-pink-300 p-8 rounded-2xl shadow-lg relative z-10"
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.6 }}
@@ -62,11 +88,12 @@ function Upload() {
 
           <input
             type="file"
-            accept="image/*"
-            onChange={(e) => setImage(e.target.files?.[0] || null)}
+            accept="image/*,video/*"
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="file:border file:border-pink-300 file:rounded-lg file:px-4 file:py-2 file:bg-pink-50 file:text-pink-700 cursor-pointer"
             required
           />
+
 
           <button
             type="submit"

@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from .models import Photo
+from .models import Media  # updated model name to handle photos & videos
 
-class PhotoSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField(use_url=True)  # ensures Cloudinary URL is returned
+class MediaSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(use_url=True, required=False)
+    video = serializers.FileField(use_url=True, required=False)
 
     class Meta:
-        model = Photo
-        fields = ['id', 'image', 'uploaded_at']
+        model = Media
+        fields = ['id', 'image', 'video', 'uploaded_at']

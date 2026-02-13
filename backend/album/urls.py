@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import PhotoListCreateView
+from .views import MediaListCreateView  # updated to new view
 
 urlpatterns = [
-    path('photos/', PhotoListCreateView.as_view(), name='photo-list-create'),
+    path('media/', MediaListCreateView.as_view(), name='media-list-create'),
 ]
