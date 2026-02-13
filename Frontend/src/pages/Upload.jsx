@@ -2,34 +2,25 @@ import { useState } from "react";
 
 function Upload() {
   const [name, setName] = useState("");
+  const [message, setMessage] = useState("");
   const [image, setImage] = useState(null);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!image) return;
 
-    const formData = new FormData();
-    formData.append("name", name);
-    formData.append("image", image);
+  const formData = new FormData();
+  formData.append("name", name);
+  formData.append("message", message);
+  formData.append("image", image);
 
-    try {
-      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/photos/`, {
-        method: "POST",
-        body: formData,
-      });
+  await fetch("https://baby-album.onrender.com/api/photos/", {
+    method: "POST",
+    body: formData,
+  });
 
-      if (!res.ok) throw new Error("Failed to upload");
 
-      setSuccessMessage("Photo added 💕");
-      setName("");
-      setImage(null);
-      setTimeout(() => setSuccessMessage(""), 3000);
-    } catch (err) {
-      setErrorMessage("Unsuccessful 😢");
-      setTimeout(() => setErrorMessage(""), 3000);
-    }
+    alert("Memory added 💕");
   };
 
   return (
@@ -43,6 +34,14 @@ function Upload() {
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-pink-300"
+          required
+        />
+
+        <textarea
+          placeholder="Message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          className="border border-gray-300 rounded-lg px-4 py-2 h-24 resize-none focus:outline-none focus:ring-2 focus:ring-pink-300"
           required
         />
 
@@ -61,9 +60,6 @@ function Upload() {
           Upload 💝
         </button>
       </form>
-
-      {successMessage && <p className="mt-4 text-green-600 font-semibold">{successMessage}</p>}
-      {errorMessage && <p className="mt-4 text-red-600 font-semibold">{errorMessage}</p>}
     </div>
   );
 }

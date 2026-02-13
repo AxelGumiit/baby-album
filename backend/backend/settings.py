@@ -1,7 +1,27 @@
 import os
 from pathlib import Path
 import dj_database_url  # Make sure it's installed: pip install dj-database-url
+from dotenv import load_dotenv  # ← to read .env
 
+import cloudinary
+
+# ----------------------
+# Load .env
+# ----------------------
+load_dotenv()  # Must be at the very top, before using os.environ
+
+# ----------------------
+# Cloudinary configuration
+# ----------------------
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUD_NAME"),
+    api_key=os.environ.get("CLOUD_API_KEY"),
+    api_secret=os.environ.get("CLOUD_API_SECRET"),
+)
+
+# ----------------------
+# Base directory
+# ----------------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ----------------------
@@ -23,7 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'corsheaders',  # ✅ For frontend API requests
+    'corsheaders',
+
+    'cloudinary',
+    'cloudinary_storage',
+
     'album',
 ]
 
@@ -77,9 +101,7 @@ DATABASES = {
 # CORS (Frontend URL)
 # ----------------------
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
-CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
-]
+CORS_ALLOWED_ORIGINS = [FRONTEND_URL]
 
 # ----------------------
 # Password Validators
@@ -99,7 +121,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ----------------------
 # Internationalization
