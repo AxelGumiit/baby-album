@@ -8,7 +8,7 @@ function Home() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-pink-100 via-rose-100 to-pink-200 flex flex-col items-center justify-center p-8 text-center"
+      className="relative flex-1 min-h-screen overflow-hidden bg-gradient-to-br from-pink-100 via-rose-100 to-pink-200 flex flex-col items-center justify-center p-8 text-center"
     >
       {/* Sparkles & Hearts */}
       <div className="absolute inset-0 -z-10 sparkle-layer-1"></div>
