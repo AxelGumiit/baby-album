@@ -1,51 +1,42 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import toast, { Toaster } from "react-hot-toast";
 
 function Upload() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
-  const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!image) return;
+    if (!file) return;
 
     const formData = new FormData();
     formData.append("name", name);
     formData.append("message", message);
-    formData.append("image", image);
+
+    // Detect file type and append to correct field
+    if (file.type.startsWith("image/")) {
+      formData.append("image", file);
+    } else if (file.type.startsWith("video/")) {
+      formData.append("video", file);
+    } else {
+      alert("Only images or videos are allowed!");
+      return;
+    }
 
     try {
-      const res = await fetch("https://baby-album.onrender.com/api/photos/", {
+      await fetch("https://baby-album.onrender.com/api/media/", {
         method: "POST",
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Upload failed");
-
-      toast.success("Memory added 💕", {
-        position: "top-center",
-        duration: 4000,
-        style: {
-          background: "#F9E0E8",
-          color: "#D6336C",
-          fontWeight: "bold",
-          borderRadius: "12px",
-          padding: "16px",
-          boxShadow: "0 4px 15px rgba(0,0,0,0.2)",
-        },
-      });
-
+      alert("Memory added 💕");
       setName("");
       setMessage("");
-      setImage(null);
+      setFile(null);
     } catch (err) {
-      toast.error("Oops! Something went wrong 😢", {
-        position: "top-center",
-        duration: 4000,
-      });
       console.error(err);
+      alert("Oops! Something went wrong 😢");
     }
   };
 
@@ -57,9 +48,6 @@ function Upload() {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Toast container */}
-      <Toaster />
-
       {/* Sparkles & Hearts */}
       <div className="absolute inset-0 -z-10 sparkle-layer-1"></div>
       <div className="absolute inset-0 -z-10 sparkle-layer-2"></div>
@@ -85,15 +73,13 @@ function Upload() {
         </h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-
           <input
             type="file"
-            accept="image/*,video/*"
+            accept="image/*,video/*" // allow both images and videos
             onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="file:border file:border-pink-300 file:rounded-lg file:px-4 file:py-2 file:bg-pink-50 file:text-pink-700 cursor-pointer"
             required
           />
-
 
           <button
             type="submit"
