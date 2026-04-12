@@ -4,85 +4,149 @@ import { motion, AnimatePresence } from "framer-motion";
 function Album() {
   const [media, setMedia] = useState([]);
   const [selectedMedia, setSelectedMedia] = useState(null);
+  const [sparkles, setSparkles] = useState([]);
 
+  // Fetch media
   useEffect(() => {
-    fetch("https://baby-album.onrender.com/api/media/") // updated endpoint
+    fetch("https://baby-album.onrender.com/api/media/")
       .then((res) => res.json())
       .then((data) => setMedia(data));
   }, []);
 
+  // ✨ Cursor sparkle trail
+  useEffect(() => {
+    const move = (e) => {
+      setSparkles((prev) => [
+        ...prev.slice(-25),
+        { id: Date.now(), x: e.clientX, y: e.clientY },
+      ]);
+    };
+    window.addEventListener("mousemove", move);
+    return () => window.removeEventListener("mousemove", move);
+  }, []);
+
+  // Download file
   const downloadFile = (url, id, type) => {
     const link = document.createElement("a");
     link.href = url;
     link.download = type === "video" ? `video-${id}.mp4` : `photo-${id}.jpg`;
-    document.body.appendChild(link);
     link.click();
-    document.body.removeChild(link);
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-pink-100 via-rose-100 to-pink-200 p-8">
-      {/* Heading */}
-      <motion.h2
-        className="text-pink-600 text-4xl md:text-5xl font-extrabold mb-10 text-center"
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8 }}
+    <div className="relative min-h-screen overflow-hidden p-8 bg-gradient-to-br from-pink-200 via-purple-200 to-yellow-100 transition-all duration-1000">
+
+      {/* 🏰 Parallax Castle */}
+      <motion.div
+        className="absolute bottom-0 w-full text-center text-[220px] opacity-20 pointer-events-none"
+        animate={{ y: 10 }}
+        transition={{ repeat: Infinity, duration: 4, repeatType: "reverse" }}
       >
-        📸 Birthday Album
+        🏰
+      </motion.div>
+
+      {/* 💖 Heart Rain */}
+      {[...Array(15)].map((_, i) => (
+        <motion.div
+          key={"heart" + i}
+          className="absolute text-pink-400 text-xl pointer-events-none"
+          initial={{ y: -100, x: Math.random() * window.innerWidth }}
+          animate={{ y: window.innerHeight + 100 }}
+          transition={{
+            duration: 6 + Math.random() * 5,
+            repeat: Infinity,
+            delay: Math.random() * 5,
+          }}
+        >
+          💖
+        </motion.div>
+      ))}
+
+      {/* 🌸 Falling Petals */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={"petal" + i}
+          className="absolute text-2xl pointer-events-none"
+          initial={{ y: -100, x: Math.random() * window.innerWidth }}
+          animate={{ y: window.innerHeight + 100, rotate: 360 }}
+          transition={{
+            duration: 8 + Math.random() * 4,
+            repeat: Infinity,
+            delay: Math.random() * 5,
+          }}
+        >
+          🌸
+        </motion.div>
+      ))}
+
+      {/* ✨ Cursor Sparkles */}
+      {sparkles.map((s) => (
+        <motion.div
+          key={s.id}
+          className="fixed text-yellow-300 pointer-events-none"
+          style={{ left: s.x, top: s.y }}
+          initial={{ scale: 1, opacity: 1 }}
+          animate={{ scale: 0, opacity: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          ✨
+        </motion.div>
+      ))}
+
+      {/* 👑 Heading */}
+      <motion.h2
+        className="text-center mb-16 text-6xl text-BLACK-200 relative z-10"
+        style={{ fontFamily: "Great Vibes" }}
+      >
+        Royal Princess Birthday Album 👑
       </motion.h2>
 
-      {/* Media Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {/* 💎 Media Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 relative z-10">
         {media.map((item) => {
           const fileUrl = item.image || item.video;
           const fileType = item.image ? "image" : "video";
-          const displayName = item.name || (fileType === "image" ? "Photo" : "Video");
 
           return (
             <motion.div
               key={item.id}
-              className="relative bg-pink-200 border-4 border-pink-500 rounded-3xl p-4 shadow-lg flex flex-col items-center overflow-hidden"
-              whileHover={{ scale: 1.05, y: -4 }}
-              transition={{ type: "spring", stiffness: 220 }}
+              whileHover={{ scale: 1.08 }}
+              className="bg-white/30 backdrop-blur-xl border border-yellow-300 rounded-[35px] p-6 shadow-xl flex flex-col items-center"
             >
-              <div className="p-1 rounded-2xl mb-3 w-full">
-                {fileType === "image" ? (
-                  <img
-                    src={fileUrl}
-                    className="w-full rounded-2xl object-cover cursor-pointer hover:opacity-95 transition duration-300"
-                    onClick={() => setSelectedMedia({ ...item, type: "image" })}
-                    title="Click to view full-screen"
-                  />
-                ) : (
-                  <video
-                    src={fileUrl}
-                    className="w-full rounded-2xl object-cover cursor-pointer hover:opacity-95 transition duration-300"
-                    onClick={() => setSelectedMedia({ ...item, type: "video" })}
-                    controls={false}
-                  />
-                )}
-              </div>
-
-              {/* Display Name */}
-              <p className="text-gray-700 font-medium mb-2 text-center">{displayName}</p>
+              {fileType === "image" ? (
+                <img
+                  src={fileUrl}
+                  className="rounded-3xl cursor-pointer"
+                  onClick={() =>
+                    setSelectedMedia({ ...item, type: "image" })
+                  }
+                />
+              ) : (
+                <video
+                  src={fileUrl}
+                  className="rounded-3xl cursor-pointer"
+                  onClick={() =>
+                    setSelectedMedia({ ...item, type: "video" })
+                  }
+                />
+              )}
 
               <button
                 onClick={() => downloadFile(fileUrl, item.id, fileType)}
-                className="mt-auto bg-pink-600 text-white px-5 py-2 rounded-full text-sm sm:text-base hover:bg-pink-500 shadow-md transition-all"
+                className="mt-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white px-6 py-2 rounded-full"
               >
-                Download
+                💎 Download
               </button>
             </motion.div>
           );
         })}
       </div>
 
-      {/* Fullscreen Modal */}
+      {/* 🌟 Modal */}
       <AnimatePresence>
         {selectedMedia && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -91,30 +155,24 @@ function Album() {
             {selectedMedia.type === "image" ? (
               <motion.img
                 src={selectedMedia.image}
-                className="max-h-[90vh] max-w-[90vw] rounded-3xl shadow-2xl object-contain"
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                className="max-h-[90vh] max-w-[90vw] rounded-3xl border-4 border-yellow-300"
+                initial={{ scale: 0.6 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.6 }}
                 onClick={(e) => e.stopPropagation()}
               />
             ) : (
               <motion.video
                 src={selectedMedia.video}
-                className="max-h-[90vh] max-w-[90vw] rounded-3xl shadow-2xl object-contain"
+                className="max-h-[90vh] max-w-[90vw] rounded-3xl border-4 border-yellow-300"
                 controls
                 autoPlay
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
+                initial={{ scale: 0.6 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.6 }}
                 onClick={(e) => e.stopPropagation()}
               />
             )}
-            <motion.button
-              onClick={() => setSelectedMedia(null)}
-              className="absolute top-5 right-5 text-white text-3xl font-bold hover:text-pink-400"
-            >
-              &times;
-            </motion.button>
           </motion.div>
         )}
       </AnimatePresence>

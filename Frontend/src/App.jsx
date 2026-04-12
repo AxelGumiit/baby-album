@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import Album from "./pages/Album";
 import Upload from "./pages/Upload";
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+
 
 function AnimatedPage({ children }) {
   return (
@@ -57,17 +57,15 @@ function App() {
         </AnimatePresence>
       </main>
 
-      <Footer />
-
-      {/* 🎵 Music Toggle Button */}
+{/* 🎵 Disney Princess Music Toggle Button */}
       <motion.button
         onClick={toggleMusic}
-        className="fixed bottom-6 right-6 z-50 bg-white/70 backdrop-blur-md px-4 py-2 rounded-full shadow-md hover:scale-105 transition"
-        whileHover={{ scale: 1.1 }}
-        animate={{ y: [0, -4, 0] }}
-        transition={{ repeat: Infinity, duration: 2 }}
+        className="fixed bottom-6 right-6 z-50 px-5 py-3 rounded-full bg-gradient-to-r from-pink-400 via-purple-400 to-yellow-300 text-white font-bold shadow-xl border-2 border-white/50 backdrop-blur-md flex items-center gap-2 hover:scale-110 transition-all"
+        whileHover={{ scale: 1.15, rotate: [0, 5, -5, 0] }}
+        animate={{ y: [0, -6, 0], rotate: 0 }}
+        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
       >
-        {playing ? "🔊 Music On" : "🔈 Music Off"}
+        {playing ? "🔊 Music On" : "🔈 Music Off"} 🎵👑
       </motion.button>
     </div>
   );
