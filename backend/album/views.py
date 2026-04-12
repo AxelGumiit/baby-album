@@ -1,5 +1,5 @@
 from rest_framework import generics
-    from .models import Media
+from .models import Media
 from .serializers import MediaSerializer
 
 class MediaListCreateView(generics.ListCreateAPIView):
