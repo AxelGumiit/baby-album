@@ -1,6 +1,7 @@
 from django.urls import path
-from .views import MediaListCreateView  # updated to new view
+from .views import MediaListCreateView, MediaRetrieveDestroyView
 
 urlpatterns = [
-    path('media/', MediaListCreateView.as_view(), name='media-list-create'),
+    path('media/', MediaListCreateView.as_view()),
+    path('media/<int:pk>/', MediaRetrieveDestroyView.as_view()),
 ]

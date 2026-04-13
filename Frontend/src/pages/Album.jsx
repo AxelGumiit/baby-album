@@ -25,12 +25,35 @@ function Album() {
     return () => window.removeEventListener("mousemove", move);
   }, []);
 
-  // Download file
+  // 💎 Download file
   const downloadFile = (url, id, type) => {
     const link = document.createElement("a");
     link.href = url;
     link.download = type === "video" ? `video-${id}.mp4` : `photo-${id}.jpg`;
     link.click();
+  };
+
+  // 🗑️ Delete media
+  const deleteMedia = async (id) => {
+    const confirmDelete = window.confirm("Delete this memory? 🥺");
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(
+        `https://baby-album.onrender.com/api/media/${id}/`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (res.ok) {
+        setMedia((prev) => prev.filter((item) => item.id !== id));
+      } else {
+        console.error("Delete failed");
+      }
+    } catch (err) {
+      console.error("Error deleting:", err);
+    }
   };
 
   return (
@@ -95,52 +118,72 @@ function Album() {
 
       {/* 👑 Heading */}
       <motion.h2
-        className="text-center mb-16 text-6xl text-BLACK-200 relative z-10"
+        className="text-center mb-16 text-6xl text-black relative z-10"
         style={{ fontFamily: "Great Vibes" }}
       >
         Royal Princess Birthday Album 👑
       </motion.h2>
 
       {/* 💎 Media Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 relative z-10">
-        {media.map((item) => {
-          const fileUrl = item.image || item.video;
-          const fileType = item.image ? "image" : "video";
+      <AnimatePresence>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 relative z-10">
+          {media.map((item) => {
+            const fileUrl = item.image || item.video;
+            const fileType = item.image ? "image" : "video";
 
-          return (
-            <motion.div
-              key={item.id}
-              whileHover={{ scale: 1.08 }}
-              className="bg-white/30 backdrop-blur-xl border border-yellow-300 rounded-[35px] p-6 shadow-xl flex flex-col items-center"
-            >
-              {fileType === "image" ? (
-                <img
-                  src={fileUrl}
-                  className="rounded-3xl cursor-pointer"
-                  onClick={() =>
-                    setSelectedMedia({ ...item, type: "image" })
-                  }
-                />
-              ) : (
-                <video
-                  src={fileUrl}
-                  className="rounded-3xl cursor-pointer"
-                  onClick={() =>
-                    setSelectedMedia({ ...item, type: "video" })
-                  }
-                />
-              )}
-
-              <button
-                onClick={() => downloadFile(fileUrl, item.id, fileType)}
-                className="mt-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white px-6 py-2 rounded-full"
+            return (
+              <motion.div
+                key={item.id}
+                layout
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.5 }}
+                whileHover={{ scale: 1.08 }}
+                className="group relative bg-white/30 backdrop-blur-xl border border-yellow-300 rounded-[35px] p-6 shadow-xl flex flex-col items-center"
               >
-                💎 Download
-              </button>
-            </motion.div>
-          );
-        })}
-      </div>
+                {fileType === "image" ? (
+                  <img
+                    src={fileUrl}
+                    className="rounded-3xl cursor-pointer"
+                    onClick={() =>
+                      setSelectedMedia({ ...item, type: "image" })
+                    }
+                  />
+                ) : (
+                  <video
+                    src={fileUrl}
+                    className="rounded-3xl cursor-pointer"
+                    onClick={() =>
+                      setSelectedMedia({ ...item, type: "video" })
+                    }
+                  />
+                )}
+
+                {/* 🎯 Hover Actions */}
+                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+
+                  {/* 🗑️ Delete */}
+                  <button
+                    onClick={() => deleteMedia(item.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg"
+                  >
+                    🗑️
+                  </button>
+
+                  {/* ⬇️ Download */}
+                  <button
+                    onClick={() => downloadFile(fileUrl, item.id, fileType)}
+                    className="bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full shadow-lg"
+                  >
+                    ⬇️
+                  </button>
+
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </AnimatePresence>
 
       {/* 🌟 Modal */}
       <AnimatePresence>

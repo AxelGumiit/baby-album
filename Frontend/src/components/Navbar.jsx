@@ -95,7 +95,7 @@ function Navbar() {
             onClick={() => setMenuOpen(!menuOpen)}
             className="text-purple-700 text-3xl hover:scale-110 transition"
           >
-            👑
+            ☰
           </button>
         </div>
       </div>
