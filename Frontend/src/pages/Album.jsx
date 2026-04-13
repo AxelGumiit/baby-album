@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
 
 function Album() {
   const [media, setMedia] = useState([]);
@@ -24,42 +25,98 @@ function Album() {
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
+  
+    const downloadFile = async (url, id, type) => {
+      try {
+        const response = await fetch(url, { mode: "cors" });
+        const blob = await response.blob();
 
-  // 💎 Download file
-  const downloadFile = (url, id, type) => {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = type === "video" ? `video-${id}.mp4` : `photo-${id}.jpg`;
-    link.click();
-  };
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
 
-  // 🗑️ Delete media
-  const deleteMedia = async (id) => {
-    const confirmDelete = window.confirm("Delete this memory? 🥺");
-    if (!confirmDelete) return;
+        link.href = blobUrl;
+        link.download =
+          type === "video" ? `video-${id}.mp4` : `photo-${id}.jpg`;
 
-    try {
-      const res = await fetch(
-        `https://baby-album.onrender.com/api/media/${id}/`,
-        {
-          method: "DELETE",
-        }
-      );
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
 
-      if (res.ok) {
-        setMedia((prev) => prev.filter((item) => item.id !== id));
-      } else {
-        console.error("Delete failed");
+        window.URL.revokeObjectURL(blobUrl);
+
+        toast.success("Saved to downloads 💎");
+      } catch (err) {
+        console.error(err);
+        toast.error("Download failed ❌");
       }
-    } catch (err) {
-      console.error("Error deleting:", err);
-    }
+    };
+
+  // 🗑️ Delete with custom toast confirmation
+  const deleteMedia = (id) => {
+    toast((t) => (
+      <div className="flex flex-col items-center gap-4 w-72 p-5 bg-white rounded-xl shadow-lg">
+        <p className="text-base font-semibold text-center">
+          Delete this memory? 🥺
+        </p>
+
+        <div className="flex gap-3">
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              const loading = toast.loading("Deleting...");
+
+              try {
+                const res = await fetch(
+                  `https://baby-album.onrender.com/api/media/${id}/`,
+                  { method: "DELETE" }
+                );
+
+                toast.dismiss(loading);
+
+                if (res.ok) {
+                  setMedia((prev) =>
+                    prev.filter((item) => item.id !== id)
+                  );
+                  toast.success("Deleted successfully 🗑️");
+                } else {
+                  toast.error("Failed to delete ❌");
+                }
+              } catch (err) {
+                toast.dismiss(loading);
+                toast.error("Error deleting ❌");
+              }
+            }}
+            className="bg-red-500 text-white px-3 py-1 rounded"
+          >
+            Yes
+          </button>
+
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="bg-gray-300 px-3 py-1 rounded"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ));
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden p-8 bg-gradient-to-br from-pink-200 via-purple-200 to-yellow-100 transition-all duration-1000">
+    <div className="relative min-h-screen overflow-hidden p-8 bg-gradient-to-br from-pink-200 via-purple-200 to-yellow-100">
 
-      {/* 🏰 Parallax Castle */}
+      {/* 🔔 Toast Container */}
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            borderRadius: "12px",
+            padding: "10px 16px",
+          },
+        }}
+      />
+
+      {/* 🏰 Castle */}
       <motion.div
         className="absolute bottom-0 w-full text-center text-[220px] opacity-20 pointer-events-none"
         animate={{ y: 10 }}
@@ -71,38 +128,20 @@ function Album() {
       {/* 💖 Heart Rain */}
       {[...Array(15)].map((_, i) => (
         <motion.div
-          key={"heart" + i}
-          className="absolute text-pink-400 text-xl pointer-events-none"
+          key={i}
+          className="absolute text-pink-400"
           initial={{ y: -100, x: Math.random() * window.innerWidth }}
           animate={{ y: window.innerHeight + 100 }}
           transition={{
             duration: 6 + Math.random() * 5,
             repeat: Infinity,
-            delay: Math.random() * 5,
           }}
         >
           💖
         </motion.div>
       ))}
 
-      {/* 🌸 Falling Petals */}
-      {[...Array(12)].map((_, i) => (
-        <motion.div
-          key={"petal" + i}
-          className="absolute text-2xl pointer-events-none"
-          initial={{ y: -100, x: Math.random() * window.innerWidth }}
-          animate={{ y: window.innerHeight + 100, rotate: 360 }}
-          transition={{
-            duration: 8 + Math.random() * 4,
-            repeat: Infinity,
-            delay: Math.random() * 5,
-          }}
-        >
-          🌸
-        </motion.div>
-      ))}
-
-      {/* ✨ Cursor Sparkles */}
+      {/* ✨ Sparkles */}
       {sparkles.map((s) => (
         <motion.div
           key={s.id}
@@ -116,10 +155,12 @@ function Album() {
         </motion.div>
       ))}
 
-      {/* 👑 Heading */}
+      {/* 👑 Title (Elegant Font Restored) */}
       <motion.h2
-        className="text-center mb-16 text-6xl text-black relative z-10"
-        style={{ fontFamily: "Great Vibes" }}
+        className="text-center mb-16 text-6xl text-pink-600 drop-shadow-lg relative z-10"
+        style={{ fontFamily: "Great Vibes, cursive" }}
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
       >
         Royal Princess Birthday Album 👑
       </motion.h2>
@@ -136,49 +177,55 @@ function Album() {
                 key={item.id}
                 layout
                 initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1 }}
                 exit={{ opacity: 0, scale: 0.5 }}
-                whileHover={{ scale: 1.08 }}
-                className="group relative bg-white/30 backdrop-blur-xl border border-yellow-300 rounded-[35px] p-6 shadow-xl flex flex-col items-center"
+                whileHover={{ scale: 1.05 }}
+                className="group relative bg-white/30 backdrop-blur-xl border rounded-3xl p-4 flex flex-col items-center"
               >
                 {fileType === "image" ? (
                   <img
                     src={fileUrl}
-                    className="rounded-3xl cursor-pointer"
                     onClick={() =>
                       setSelectedMedia({ ...item, type: "image" })
                     }
+                    className="rounded-2xl cursor-pointer"
                   />
                 ) : (
                   <video
                     src={fileUrl}
-                    className="rounded-3xl cursor-pointer"
                     onClick={() =>
                       setSelectedMedia({ ...item, type: "video" })
                     }
+                    className="rounded-2xl cursor-pointer"
                   />
                 )}
 
                 {/* 🎯 Hover Actions */}
-                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition">
+              <div
+                className="absolute top-2 right-2 flex gap-2 
+                          bg-white/40 backdrop-blur-md p-2 rounded-full shadow-lg
+                          opacity-70 group-hover:opacity-100 transition"
+              >
+                {/* 🗑️ Delete */}
+                <button
+                  onClick={() => deleteMedia(item.id)}
+                  className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg 
+                            transition transform hover:scale-110 hover:shadow-red-400/50"
+                  title="Delete"
+                >
+                  🗑️
+                </button>
 
-                  {/* 🗑️ Delete */}
-                  <button
-                    onClick={() => deleteMedia(item.id)}
-                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg"
-                  >
-                    🗑️
-                  </button>
-
-                  {/* ⬇️ Download */}
-                  <button
-                    onClick={() => downloadFile(fileUrl, item.id, fileType)}
-                    className="bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full shadow-lg"
-                  >
-                    ⬇️
-                  </button>
-
-                </div>
+                {/* ⬇ Download */}
+                <button
+                  onClick={() => downloadFile(fileUrl, item.id, fileType)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg 
+                            transition transform hover:scale-110 hover:shadow-purple-400/50"
+                  title="Download"
+                >
+                  ⬇️
+                </button>
+              </div>
               </motion.div>
             );
           })}
@@ -189,31 +236,20 @@ function Album() {
       <AnimatePresence>
         {selectedMedia && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-xl"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
             onClick={() => setSelectedMedia(null)}
           >
             {selectedMedia.type === "image" ? (
-              <motion.img
+              <img
                 src={selectedMedia.image}
-                className="max-h-[90vh] max-w-[90vw] rounded-3xl border-4 border-yellow-300"
-                initial={{ scale: 0.6 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.6 }}
-                onClick={(e) => e.stopPropagation()}
+                className="max-h-[90vh] max-w-[90vw] rounded-xl"
               />
             ) : (
-              <motion.video
+              <video
                 src={selectedMedia.video}
-                className="max-h-[90vh] max-w-[90vw] rounded-3xl border-4 border-yellow-300"
                 controls
                 autoPlay
-                initial={{ scale: 0.6 }}
-                animate={{ scale: 1 }}
-                exit={{ scale: 0.6 }}
-                onClick={(e) => e.stopPropagation()}
+                className="max-h-[90vh] max-w-[90vw]"
               />
             )}
           </motion.div>
