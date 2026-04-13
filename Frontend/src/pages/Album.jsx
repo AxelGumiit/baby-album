@@ -25,33 +25,33 @@ function Album() {
     window.addEventListener("mousemove", move);
     return () => window.removeEventListener("mousemove", move);
   }, []);
-  
-    const downloadFile = async (url, id, type) => {
-      try {
-        const response = await fetch(url, { mode: "cors" });
-        const blob = await response.blob();
 
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement("a");
+  // ⬇ Download
+  const downloadFile = async (url, id, type) => {
+    try {
+      const response = await fetch(url, { mode: "cors" });
+      const blob = await response.blob();
 
-        link.href = blobUrl;
-        link.download =
-          type === "video" ? `video-${id}.mp4` : `photo-${id}.jpg`;
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
 
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+      link.href = blobUrl;
+      link.download = type === "video" ? `video-${id}.mp4` : `photo-${id}.jpg`;
 
-        window.URL.revokeObjectURL(blobUrl);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
 
-        toast.success("Saved to downloads 💎");
-      } catch (err) {
-        console.error(err);
-        toast.error("Download failed ❌");
-      }
-    };
+      window.URL.revokeObjectURL(blobUrl);
 
-  // 🗑️ Delete with custom toast confirmation
+      toast.success("Saved to downloads 💎");
+    } catch (err) {
+      console.error(err);
+      toast.error("Download failed ❌");
+    }
+  };
+
+  // 🗑 Delete
   const deleteMedia = (id) => {
     toast((t) => (
       <div className="flex flex-col items-center gap-4 w-72 p-5 bg-white rounded-xl shadow-lg">
@@ -74,9 +74,7 @@ function Album() {
                 toast.dismiss(loading);
 
                 if (res.ok) {
-                  setMedia((prev) =>
-                    prev.filter((item) => item.id !== id)
-                  );
+                  setMedia((prev) => prev.filter((item) => item.id !== id));
                   toast.success("Deleted successfully 🗑️");
                 } else {
                   toast.error("Failed to delete ❌");
@@ -105,16 +103,7 @@ function Album() {
   return (
     <div className="relative min-h-screen overflow-hidden p-8 bg-gradient-to-br from-pink-200 via-purple-200 to-yellow-100">
 
-      {/* 🔔 Toast Container */}
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            borderRadius: "12px",
-            padding: "10px 16px",
-          },
-        }}
-      />
+      <Toaster position="top-center" />
 
       {/* 🏰 Castle */}
       <motion.div
@@ -125,17 +114,14 @@ function Album() {
         🏰
       </motion.div>
 
-      {/* 💖 Heart Rain */}
+      {/* 💖 Hearts */}
       {[...Array(15)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute text-pink-400"
           initial={{ y: -100, x: Math.random() * window.innerWidth }}
           animate={{ y: window.innerHeight + 100 }}
-          transition={{
-            duration: 6 + Math.random() * 5,
-            repeat: Infinity,
-          }}
+          transition={{ duration: 6 + Math.random() * 5, repeat: Infinity }}
         >
           💖
         </motion.div>
@@ -155,9 +141,9 @@ function Album() {
         </motion.div>
       ))}
 
-      {/* 👑 Title (Elegant Font Restored) */}
+      {/* Title */}
       <motion.h2
-        className="text-center mb-16 text-6xl text-pink-600 drop-shadow-lg relative z-10"
+        className="text-center mb-16 text-6xl text-pink-600"
         style={{ fontFamily: "Great Vibes, cursive" }}
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -165,7 +151,7 @@ function Album() {
         Royal Princess Birthday Album 👑
       </motion.h2>
 
-      {/* 💎 Media Grid */}
+      {/* MEDIA GRID */}
       <AnimatePresence>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 relative z-10">
           {media.map((item) => {
@@ -182,57 +168,49 @@ function Album() {
                 whileHover={{ scale: 1.05 }}
                 className="group relative bg-white/30 backdrop-blur-xl border rounded-3xl p-4 flex flex-col items-center"
               >
+                {/* Media */}
                 {fileType === "image" ? (
                   <img
                     src={fileUrl}
-                    onClick={() =>
-                      setSelectedMedia({ ...item, type: "image" })
-                    }
+                    onClick={() => setSelectedMedia({ ...item, type: "image" })}
                     className="rounded-2xl cursor-pointer"
                   />
                 ) : (
                   <video
                     src={fileUrl}
-                    onClick={() =>
-                      setSelectedMedia({ ...item, type: "video" })
-                    }
+                    onClick={() => setSelectedMedia({ ...item, type: "video" })}
                     className="rounded-2xl cursor-pointer"
                   />
                 )}
 
-                {/* 🎯 Hover Actions */}
-              <div
-                className="absolute top-2 right-2 flex gap-2 
-                          bg-white/40 backdrop-blur-md p-2 rounded-full shadow-lg
-                          opacity-70 group-hover:opacity-100 transition"
-              >
-                {/* 🗑️ Delete */}
-                <button
-                  onClick={() => deleteMedia(item.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-full shadow-lg 
-                            transition transform hover:scale-110 hover:shadow-red-400/50"
-                  title="Delete"
-                >
-                  🗑️
-                </button>
+                {/* 👤 Uploader */}
+                <p className="mt-3 text-sm font-semibold text-purple-700">
+                  👤 uploaded by {item.uploader_name || "Anonymous"}
+                </p>
 
-                {/* ⬇ Download */}
-                <button
-                  onClick={() => downloadFile(fileUrl, item.id, fileType)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg 
-                            transition transform hover:scale-110 hover:shadow-purple-400/50"
-                  title="Download"
-                >
-                  ⬇️
-                </button>
-              </div>
+                {/* Actions */}
+                <div className="absolute top-2 right-2 flex gap-2 bg-white/40 backdrop-blur-md p-2 rounded-full shadow-lg opacity-70 group-hover:opacity-100 transition">
+                  <button
+                    onClick={() => deleteMedia(item.id)}
+                    className="bg-red-500 text-white p-3 rounded-full"
+                  >
+                    🗑️
+                  </button>
+
+                  <button
+                    onClick={() => downloadFile(fileUrl, item.id, fileType)}
+                    className="bg-purple-600 text-white p-3 rounded-full"
+                  >
+                    ⬇️
+                  </button>
+                </div>
               </motion.div>
             );
           })}
         </div>
       </AnimatePresence>
 
-      {/* 🌟 Modal */}
+      {/* MODAL */}
       <AnimatePresence>
         {selectedMedia && (
           <motion.div
